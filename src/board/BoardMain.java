@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class BoardMain {
 
 	public static void main(String[] args) {
+		
 		try {
 			while(true) {
 
@@ -43,7 +44,7 @@ public class BoardMain {
 			}
 		}catch(Exception e){
 			e.printStackTrace();
-			//예외처리 일단 대충해놨음 나중에 더 디테일하게 예외처리하기
+			//예외처리 일단 대충해놨음 나중에 더 디테일하게 예외처리하기\
 		}finally {
 			
 		}

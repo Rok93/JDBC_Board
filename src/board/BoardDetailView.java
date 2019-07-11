@@ -32,6 +32,7 @@ public class BoardDetailView {
 		System.out.println("22.글삭제 ");
 		System.out.println("23.첫화면 ");
 
+		System.out.print("번호를 입력하세요 : ");
 		int input = sc.nextInt();
 		while(true) {
 			if(input == 21) {
