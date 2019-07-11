@@ -32,7 +32,8 @@ public class BoardMain {
 					
 				}
 				else if(menu == 3) { // 3. 조건별 조회
-
+					BoardConditionListView conditionview = new BoardConditionListView();
+					conditionview.input();
 				}
 				else if(menu == 4) { // 4. 회원별 조회
 
