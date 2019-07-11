@@ -36,7 +36,8 @@ public class BoardMain {
 					conditionview.input();
 				}
 				else if(menu == 4) { // 4. 회원별 조회
-
+					BoardMemberListView memberview = new BoardMemberListView();
+					memberview.input();
 				}
 				//메뉴 추가 고려해서 일단 4번까지 전부 else if 로 처리
 			}

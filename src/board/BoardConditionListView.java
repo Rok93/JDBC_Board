@@ -37,7 +37,7 @@ public class BoardConditionListView {
 		}
 		else if(inputnum == 4) { // 4.조회수
 			int intInput = sc.nextInt();
-			list = bd.getConditionList("seq", String.valueOf(intInput));
+			list = bd.getConditionList("viewcount", String.valueOf(intInput));
 			//주의 int타입 ->  String 타입 형변환 하여 전달하였음. BoardDAO 에서도 생각해서 처리해야함.
 		}
 		else if(inputnum == 5){
@@ -46,7 +46,7 @@ public class BoardConditionListView {
 			// split 메소드 이용하여 - 단위로 자르자.
 		}
 
-		System.out.println("**************************조회 시작 **************************");
+		System.out.println("**************************조회 종료 **************************");
 
 		for(BoardVO vo: list) {
 			//제목, 작성자,작성시간 
@@ -56,5 +56,9 @@ public class BoardConditionListView {
 		}
 		
 		System.out.println("**************************조회 종료 **************************");
+		
+		//상세조회
+				BoardDetailView bdv = new BoardDetailView();
+				bdv.input();
 	}
 }

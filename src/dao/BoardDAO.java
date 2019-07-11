@@ -10,49 +10,76 @@ import vo.BoardVO;
 
 public class BoardDAO {
 
-	
+
 	/**
-	 * 3번 조건별 글 조회 메소드
-	 * 선택 가능한 컬럼명은 다음과 같습니다.
-	 * 1. 제목 2. 내용 3. 작성자 4. 조회수 5. 모두 
-	 * 컬럼명 : 1 , 2 ,  3
-	 * 조회조건 : 게시판 
-	 * ==> 제목/내용/작성자 에 게시판 포함 글 리스트         %게시판%
-	 * @param colname
-	 * @param word
-	 * @return
+	 * 상세 글 조회 메소드
+	 * 조회 (조회수 +1)
+	 * 수정, 삭제
 	 */
-	public ArrayList<BoardVO> getConditionList(String colname , String word) throws Exception{
-		
+
+
+	public ArrayList<BoardVO> getBoard(int seq) throws Exception{
+
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", 
+					"jdbc", "jdbc");
+			
+			String sql = "select viewcount from board where seq like " + seq;
+			PreparedStatement ps = con.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+			int ViewCount = rs.getInt("viewcount");
+			ViewCount++;
+			String sqlplus = "update board set viewcount = " + ViewCount 
+					+ " where seq like " + seq;
+			ps = con.prepareStatement(sqlplus);
+			
+			String sql2 = "select * from board where  " + seq;
+			PreparedStatement ps2 = con.prepareStatement(sql2);
+			ResultSet rs2 = ps.executeQuery();
+			
+			ArrayList<BoardVO> list = new ArrayList<BoardVO>();
+			
+			if(rs2.getInt("viewcount") == (ViewCount-1)) {
+				System.out.println("조회수 오류");
+				return list;
+			}
+			
+			while(rs2.next()) {
+				BoardVO bv = new BoardVO(rs2.getString("title"));
+				bv.setSeq(rs2.getInt("seq"));
+				bv.setWriter(rs2.getString("writer"));
+				bv.setTime(rs2.getString("time")); 
+				bv.setViewcount(rs2.getInt("viewcount")); 
+				bv.setContents(rs2.getString("contents"));
+				list.add(bv);
+			}
+
+			
+			return list;
+			
+	}
+
+	/**
+	 * 4. 회원별 글조회
+	 * @param name
+	 * @return
+	 * @throws Exception
+	 */
+	public ArrayList<BoardVO> getMemberWritingList(String name) throws Exception{
+
 		Class.forName("oracle.jdbc.driver.OracleDriver");
 		Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", 
 				"jdbc", "jdbc");
-		
-		String[] colnames = colname.split("-"); //- 기준으로 분리
 
 		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
-		
-		String sql;
-		
-		if(colnames.length == 3) {
-		
-		sql = "select seq, title, writer, time, viewcount"
-				+ " from (select * from board)"
-				+ " where " + colnames[0] + " like '%" + word + "%' "
-				+ " or + " + colnames[1] +  " like '%" + word + "%' "
-				+ " or + " + colnames[2] +  " like '%" + word + "%' ";
-		}
-		
-		else {
-			
-		sql = "select seq, title, writer, time, viewcount, contents"
-					+ " from (select * from board)"
-					+ " where " + colname + " like '%" + word + "%' ";
-		}
-		
+
+		String sql = "select seq, title, writer, time, viewcount, contents"
+				+ " from (select * from board order by seq)"
+				+ " where writer like '" + name + "'";
+
 		PreparedStatement ps = con.prepareStatement(sql);
 		ResultSet rs = ps.executeQuery();
-		
+
 		while(rs.next()) {
 			BoardVO bv = new BoardVO(rs.getString("title"));
 			bv.setSeq(rs.getInt("seq"));
@@ -65,7 +92,70 @@ public class BoardDAO {
 		con.close();
 		return list;
 	}
-	
+
+	/**
+	 * 3번 조건별 글 조회 메소드
+	 * 선택 가능한 컬럼명은 다음과 같습니다.
+	 * 1. 제목 2. 내용 3. 작성자 4. 조회수 5. 모두 
+	 * 컬럼명 : 1 , 2 ,  3
+	 * 조회조건 : 게시판 
+	 * ==> 제목/내용/작성자 에 게시판 포함 글 리스트         %게시판%
+	 * @param colname
+	 * @param word
+	 * @return
+	 */
+	public ArrayList<BoardVO> getConditionList(String colname , String word) throws Exception{
+
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", 
+				"jdbc", "jdbc");
+
+		String[] colnames = colname.split("-"); //- 기준으로 분리
+
+		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
+
+		String sql;
+
+		if(colnames.equals("viewcount")){
+			int std = Integer.parseInt(word);
+			sql = "select seq, title, writer, time, viewcount, contents"
+					+ " from (select * from board order by seq)"
+					+ " where viewcount >= " + std;
+		}
+		else {
+			if(colnames.length == 3) { //title-contents-writer
+
+				sql = "select seq, title, writer, time, viewcount, contents"
+						+ " from (select * from board order by seq)"
+						+ " where " + colnames[0] + " like '%" + word + "%' "
+						+ " or + " + colnames[1] +  " like '%" + word + "%' "
+						+ " or + " + colnames[2] +  " like '%" + word + "%' ";
+			}
+
+			else {
+
+				sql = "select seq, title, writer, time, viewcount, contents"
+						+ " from (select * from board order by seq)"
+						+ " where " + colname + " like '%" + word + "%' ";
+			}
+		}
+
+		PreparedStatement ps = con.prepareStatement(sql);
+		ResultSet rs = ps.executeQuery();
+
+		while(rs.next()) {
+			BoardVO bv = new BoardVO(rs.getString("title"));
+			bv.setSeq(rs.getInt("seq"));
+			bv.setWriter(rs.getString("writer"));
+			bv.setTime(rs.getString("time")); 
+			bv.setViewcount(rs.getInt("viewcount")); 
+			bv.setContents(rs.getString("contents"));
+			list.add(bv);
+		}
+		con.close();
+		return list;
+	}
+
 	/**
 	 * 2번 페이지별 글 조회 메소드
 	 * @param pagenum
@@ -94,11 +184,11 @@ public class BoardDAO {
 		PreparedStatement st = con.prepareStatement(sql);
 		st.setInt(1, start);
 		st.setInt(2, end);
-		
+
 		ResultSet rs = st.executeQuery();   
-		
+
 		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
-		
+
 		while(rs.next()) {
 			BoardVO bv = new BoardVO(rs.getString("title"));
 			bv.setWriter(rs.getString("writer"));
@@ -130,7 +220,7 @@ public class BoardDAO {
 		int row = pt.executeUpdate(); //여러개 값이라서 executeUpdate
 		System.out.println(row);
 		con.close();
-		
+
 		System.out.println("게시물 작성을 완료하였습니다.");
 	}
 

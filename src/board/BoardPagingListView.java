@@ -31,6 +31,9 @@ public class BoardPagingListView {
 			+ " 작성자 : " + vo.getWriter() + " 작성시간 : " + vo.getTime());
 		}
 		System.out.println("*************조회 종료 *************");
+		//상세조회
+				BoardDetailView bdv = new BoardDetailView();
+				bdv.input();
 	}
 	
 	public void view() {
