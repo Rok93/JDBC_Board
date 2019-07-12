@@ -71,9 +71,9 @@ public class BoardDAO {
 		
 		Scanner sc = new Scanner(System.in);
 		System.out.print("변경 제목 입력: ");
-		String newTitle = sc.next();
+		String newTitle = sc.nextLine();
 		System.out.print("변경 내용 입력: ");
-		String newContents = sc.next();
+		String newContents = sc.nextLine();
 		
 		Class.forName("oracle.jdbc.driver.OracleDriver");
 		Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", 
@@ -94,18 +94,18 @@ public class BoardDAO {
 		
 		boolean ck = false;
 		for(int i = 0; i <list.size(); i++) {
-			System.out.println("member id = " + list.get(i));
 			if(list.get(i).equals(newWriter)) {
 				ck = true;
 				break; //굳이 다 돌필요 없잖아~ 하나라도 일치하면 바로 반복문 탈출
 			}
 		}
 		
-		if(ck) { //member 라면 글 수정 진행
+		if(ck) { //member 라면 글 수정 진행  (날짜도 변경되야한다는것 중요!!)
 			sql = "update board set "
 					+ " title = '" + newTitle + "',"
 					+ " contents = '" + newContents + "',"
-					+ " writer = '" + newWriter + "'"
+					+ " writer = '" + newWriter + "',"
+					+ " time = sysdate"
 					+ " where seq like " + seq;
 			
 			ps = con.prepareStatement(sql);
